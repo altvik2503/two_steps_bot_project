@@ -1,0 +1,46 @@
+{
+    // Используйте IntelliSense, чтобы узнать о возможных атрибутах.
+    // Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
+    // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Kotlet Bot",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/two_steps_bot/manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "two_steps_bot"
+            ],
+            "justMyCode": true
+        },
+        {
+            "name": "2-steps",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/two_steps_bot.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "текущий файл",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "DB server",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/bot_events_assist/manage.py",
+            "args": [
+                "runserver"
+            ],
+            "django": true,
+            "justMyCode": true
+        }
+    ]
+}
