@@ -1,0 +1,1 @@
+worker: python two_steps_bot.py
