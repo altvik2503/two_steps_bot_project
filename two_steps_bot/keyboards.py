@@ -114,8 +114,8 @@ MESSAGES = {
         CBB_PESTELYA: 'Открытый двор - ул. Чайковского, 2.',
     },
     CBB_IN_YARD_PARKING: {
-        CBB_NEVSKY: 'Нет, заезда во двор, к сожалению, нет.',
-        CBB_PESTELYA: 'По запросу.',
+        CBB_NEVSKY: 'По согласованию.',
+        CBB_PESTELYA: 'Нет, заезда во двор, к сожалению, нет.',
     },
     CBB_SHOPS: {
         CBB_PESTELYA:

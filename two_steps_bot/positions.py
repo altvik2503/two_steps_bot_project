@@ -1,10 +1,23 @@
-from typing import Optional, List
+from typing import Optional, List, Union, Tuple
+from telegram import (
+    Update,
+    ParseMode,
+)
+from telegram.ext import (
+    Updater,
+    Handler,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    Filters,
+    CallbackContext,
+)
 
 
 class Position():
     """Точка остановки."""
 
-    def __init__(self, dimensions: List['Direction']) -> None:
+    def __init__(self, dimensions: List['Direction'] = []) -> None:
         self._dimentions = dimensions
         self._active = 0
 
@@ -38,6 +51,12 @@ class Position():
         """Поворачивает текущее направление направо."""
         self._rotate(1)
 
+    def add(self, directions: Union['Direction', List['Direction']]) -> None:
+        if isinstance(directions, (List, Tuple)):
+            self._dimentions.extend(directions)
+        else:
+            self._dimentions.append(directions)
+
 
 class Direction():
     """Направление."""
@@ -57,16 +76,24 @@ class Direction():
         return self._next
 
 
-class Map():
+class Tour():
     """Продвигает пользователя по сети позиций."""
 
-    def __init__(self, head: Position) -> None:
-        """Принимает начальную позицию."""
+    def __init__(self, updater: Updater, head: Position) -> None:
+        """Принимает бот и начальную позицию."""
         self._active = head
+        self._updater = updater
 
     def _update(self) -> None:
         """Обновляет изобажение у пользователя."""
         pass
+
+    def start(self):
+        self._updater.start_polling()
+        self._updater.idle()
+
+    def stop(self):
+        self._updater.stop()
 
     def step(self) -> None:
         """Переводит текущее положение в следующую позицию."""
@@ -84,3 +111,11 @@ class Map():
         """Поворачивает вправо."""
         self._active.left()
         self._update()
+
+    def add_handlers(self, handlers: Union[List[Handler], Handler]) -> None:
+        if isinstance(handlers, (List, Tuple)):
+            for handler in handlers:
+                self._updater.dispatcher.add_handler(handler)
+        else:
+            self._updater.dispatcher.add_handler(handlers)
+

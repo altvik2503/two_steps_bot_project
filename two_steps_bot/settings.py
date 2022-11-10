@@ -1,3 +1,12 @@
+from pathlib import Path
+import sys
+
+BASE_DIR = Path.cwd().parent
+CODE_DIR_PATH = BASE_DIR / 'two_steps_bot'
+sys.path.append(str(CODE_DIR_PATH))
+
+STATIC = 'static'
+
 TOKEN = '5673765058:AAHjhehxRV-U79KjntGh3laCpoGaG1A6-Cw'
 
 DEBUG = True
