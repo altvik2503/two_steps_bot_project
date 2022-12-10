@@ -1,69 +1,87 @@
-from typing import List, Any, Iterable, Tuple
+from typing import List, Any, Iterable, Tuple, Union
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    ReplyMarkup,
 )
 
 # Buttons
-CBB_ALL = 'all'
-CBB_PESTELYA = 'pestelya'
-CBB_NEVSKY = 'nevsky'
+class ILButton1(InlineKeyboardButton):
+    """Класс кнопки, инициируемой текстом."""
+    _CENTER_WIDTH = 30
+    _CENTER_FILL = '_'
+    def __init__(self, cbb: str, caption = None, message: str = '', **_kwargs: Any):
+        self._message = message
+        _caption = caption if caption else ILB_CAPTIONS[cbb]
+        super().__init__(text=_caption, callback_data=cbb, **_kwargs)
 
-CBB_CHECK_IN_TIME = 'check_in_time'
-CBB_EARLY_LATE_CHECK = 'early_check'
-CBB_IN_YARD_PARKING = 'in_yard_parking'
-CBB_NEAREST_PARKING = 'nearest_parking'
-CBB_SETTLEMENT = 'settlement'
-CBB_PAYMENT_BY_CARD = 'payment_by_card'
-CBB_PREPAYMENT = 'prepayment'
-CBB_PAYMENT_MADE = 'payment_made'
-CBB_BOOKING_CANCEL = 'booking_cancel'
-CBB_SHOPS = 'shops'
-CBB_TOWEL = 'towel'
-CBB_GET_TO = 'get_to'
-CBB_EAT = 'eat'
-CBB_WHAT_PROVIDE = 'what_provide'
+    def __str__(self) -> str:
+        return self._message
 
-CBB_CHECK_IN = 'check_in'
-CBB_PAYMENT = 'payment'
-CBB_OTHER = 'other'
-CBB_HOSTELS = 'hostels'
+    def center(self, fill=_CENTER_FILL, width=_CENTER_WIDTH):
+        self.text.center(width, fill)
+        return self
 
-CBB_CAPTIONS = {
-    CBB_PESTELYA: 'Пестеля',
-    CBB_NEVSKY: 'Невский',
 
-    CBB_CHECK_IN_TIME: 'Время заезда/ выезда.',
-    CBB_EARLY_LATE_CHECK: 'Стоимость раннего заезда/позднего выезда.',
-    CBB_IN_YARD_PARKING: 'Можно ли припарковать машину во дворе?',
-    CBB_NEAREST_PARKING: 'Есть ли поблизости парковки?',
-    CBB_SETTLEMENT: 'Как происходит процесс заселения?',
-    CBB_PAYMENT_BY_CARD: 'Возможна ли оплата кредитной картой?',
-    CBB_PREPAYMENT: 'Бронь напрямую. Предоплата.',
-    CBB_PAYMENT_MADE: 'Каким образом происходит оплата?',
-    CBB_BOOKING_CANCEL: 'Если я захочу отменить бронирование...',
-    CBB_SHOPS: 'Есть ли рядом магазины?',
-    CBB_TOWEL: 'Белье и полотенца.',
-    CBB_GET_TO: 'Как доехать?',
-    CBB_EAT: 'Где перекусить быстро/не дорого?',
-    CBB_WHAT_PROVIDE:
+ILB_ALL = 'all'
+ILB_PESTELYA = 'pestelya'
+ILB_NEVSKY = 'nevsky'
+
+ILB_CHECK_IN_TIME = 'check_in_time'
+ILB_EARLY_LATE_CHECK = 'early_check'
+ILB_IN_YARD_PARKING = 'in_yard_parking'
+ILB_NEAREST_PARKING = 'nearest_parking'
+ILB_SETTLEMENT = 'settlement'
+ILB_PAYMENT_BY_CARD = 'payment_by_card'
+ILB_PREPAYMENT = 'prepayment'
+ILB_PAYMENT_MADE = 'payment_made'
+ILB_BOOKING_CANCEL = 'booking_cancel'
+ILB_SHOPS = 'shops'
+ILB_TOWEL = 'towel'
+ILB_GET_TO = 'get_to'
+ILB_EAT = 'eat'
+ILB_WHAT_PROVIDE = 'what_provide'
+
+ILB_CHECK_IN = 'check_in'
+ILB_PAYMENT = 'payment'
+ILB_OTHER = 'other'
+ILB_HOSTELS = 'hostels'
+
+ILB_CAPTIONS = {
+    ILB_PESTELYA: 'Пестеля',
+    ILB_NEVSKY: 'Невский',
+
+    ILB_CHECK_IN_TIME: 'Время заезда/ выезда.',
+    ILB_EARLY_LATE_CHECK: 'Стоимость раннего заезда/позднего выезда.',
+    ILB_IN_YARD_PARKING: 'Можно ли припарковать машину во дворе?',
+    ILB_NEAREST_PARKING: 'Есть ли поблизости парковки?',
+    ILB_SETTLEMENT: 'Как происходит процесс заселения?',
+    ILB_PAYMENT_BY_CARD: 'Возможна ли оплата кредитной картой?',
+    ILB_PREPAYMENT: 'Бронь напрямую. Предоплата.',
+    ILB_PAYMENT_MADE: 'Каким образом происходит оплата?',
+    ILB_BOOKING_CANCEL: 'Если я захочу отменить бронирование...',
+    ILB_SHOPS: 'Есть ли рядом магазины?',
+    ILB_TOWEL: 'Белье и полотенца.',
+    ILB_GET_TO: 'Как доехать?',
+    ILB_EAT: 'Где перекусить быстро/не дорого?',
+    ILB_WHAT_PROVIDE:
         'Предоставляете ли тапочки, шапочки для душа, '
         'косметические средства?',
 
-    CBB_CHECK_IN: 'Заезд...',
-    CBB_PAYMENT: 'Оплата...',
-    CBB_OTHER: 'Другое...',
-    CBB_HOSTELS: 'Отель...',
+    ILB_CHECK_IN: 'Заезд...',
+    ILB_PAYMENT: 'Оплата...',
+    ILB_OTHER: 'Другое...',
+    ILB_HOSTELS: 'Отель...',
 }
 
 HOSTELS = (
-    CBB_NEVSKY,
-    CBB_PESTELYA,
+    ILB_NEVSKY,
+    ILB_PESTELYA,
 )
 
 MESSAGES = {
-    CBB_GET_TO: {
-        CBB_PESTELYA:
+    ILB_GET_TO: {
+        ILB_PESTELYA:
             '*Аэропорт Пулково:*\n'
             'автобус 39 - ст.м. Московская - ст.м. Гостиный двор '
             '- пешком до ул. Пестеля 5,\n'
@@ -72,7 +90,7 @@ MESSAGES = {
             'общ. транспорт по Невскому пр., до ст. Гостиный двор. '
             'Далее пешком 15 минут,\n'
             'или "Яндекс такси" 180-280 руб.',
-        CBB_NEVSKY:
+        ILB_NEVSKY:
             '*Аэропорт Пулково:*\n'
             'автобус 39 - ст.м. Московская - ст.м. Пл. Восстания '
             '- пешком до Невский пр. 128 (5 минут).\n'
@@ -80,115 +98,119 @@ MESSAGES = {
             '*Московский вокзал:*\n'
             'Пешком 5 минут до Невского пр., 128.',
     },
-    CBB_CHECK_IN_TIME: {
-        CBB_ALL: 'Заезд в любое время после 14.00, выезд до 11.00.',
+    ILB_CHECK_IN_TIME: {
+        ILB_ALL: 'Заезд в любое время после 14.00, выезд до 11.00.',
     },
-    CBB_EARLY_LATE_CHECK: {
-        CBB_ALL:
+    ILB_EARLY_LATE_CHECK: {
+        ILB_ALL:
             'Стоимость раннего заезда или позднего выезда '
             'составляет 70% от стоимости дня.',
     },
-    CBB_SETTLEMENT: {
-        CBB_ALL:
+    ILB_SETTLEMENT: {
+        ILB_ALL:
             'Заселение дистанционное, мы присылаем гостям подробную инструкцию, '
             'ключи в сейфе у квартиры, в случае возникновения вопросов '
             'звоните по телефону +7 (906) 256-65-23.',
     },
-    CBB_PAYMENT_BY_CARD: {
-        CBB_ALL: 'Оплата возможна только переводом или наличными.',
+    ILB_PAYMENT_BY_CARD: {
+        ILB_ALL: 'Оплата возможна только переводом или наличными.',
     },
-    CBB_PREPAYMENT: {
-        CBB_ALL:
+    ILB_PREPAYMENT: {
+        ILB_ALL:
             'Стоимость предоплаты составляет 30% от общей '
             'стоимости проживания.'
             'Только после внесения предоплаты мы закрепляем Вашу бронь.',
     },
-    CBB_PAYMENT_MADE: {
-        CBB_ALL: 'Оплата вносится после заезда переводом или наличными.',
+    ILB_PAYMENT_MADE: {
+        ILB_ALL: 'Оплата вносится после заезда переводом или наличными.',
     },
-    CBB_BOOKING_CANCEL: {
-        CBB_ALL: 'Бесплатная отмена не позднее 2-х недель до даты заезда.',
+    ILB_BOOKING_CANCEL: {
+        ILB_ALL: 'Бесплатная отмена не позднее 2-х недель до даты заезда.',
     },
-    CBB_NEAREST_PARKING: {
-        CBB_ALL: 'Все парковки в центре платные с 8 до 20.',
-        CBB_PESTELYA: 'Открытый двор - ул. Чайковского, 2.',
+    ILB_NEAREST_PARKING: {
+        ILB_ALL: 'Все парковки в центре платные с 8 до 20.',
+        ILB_PESTELYA: 'Открытый двор - ул. Чайковского, 2.',
     },
-    CBB_IN_YARD_PARKING: {
-        CBB_NEVSKY: 'По согласованию.',
-        CBB_PESTELYA: 'Нет, заезда во двор, к сожалению, нет.',
+    ILB_IN_YARD_PARKING: {
+        ILB_NEVSKY: 'По согласованию.',
+        ILB_PESTELYA: 'Нет, заезда во двор, к сожалению, нет.',
     },
-    CBB_SHOPS: {
-        CBB_PESTELYA:
+    ILB_SHOPS: {
+        ILB_PESTELYA:
             '"Дикси", ул. Пестеля, 12.\n'
             '"Фермер", ул. Пестеля, 13.\n'
             '"Азбука вкуса", Литейный пр., 26.',
-        CBB_NEVSKY:
+        ILB_NEVSKY:
             '"ВкусВилл", Невский пр., 130.\n'
             '"Дикси", Невский пр., 126/2.',
     },
-    CBB_EAT: {
-        CBB_PESTELYA: 'Столовая "Тарелка", ул. Пестеля, 8.',
-        CBB_NEVSKY:
+    ILB_EAT: {
+        ILB_PESTELYA: 'Столовая "Тарелка", ул. Пестеля, 8.',
+        ILB_NEVSKY:
             'Столовая №1, Невский пр., 126, '
             '(напротив железной кареты).',
     },
-    CBB_TOWEL: {
-        CBB_ALL:
+    ILB_TOWEL: {
+        ILB_ALL:
             'Мы предоставляем постельное белье и по 2 полотенца на гостя.',
     },
-    CBB_WHAT_PROVIDE: {
-        CBB_ALL: 'Нет 😙. Только средство д/мытья посуды и жидкое мыло.',
+    ILB_WHAT_PROVIDE: {
+        ILB_ALL: 'Нет 😙. Только средство д/мытья посуды и жидкое мыло.',
     },
 }
 
 # Questions groups
 CATEGORIES = {
-    CBB_CHECK_IN: (
-        CBB_GET_TO,
-        CBB_CHECK_IN_TIME,
-        CBB_EARLY_LATE_CHECK,
-        CBB_SETTLEMENT,
+    ILB_CHECK_IN: (
+        ILB_GET_TO,
+        ILB_CHECK_IN_TIME,
+        ILB_EARLY_LATE_CHECK,
+        ILB_SETTLEMENT,
     ),
-    CBB_PAYMENT: (
-        CBB_PAYMENT_MADE,
-        CBB_PAYMENT_BY_CARD,
-        CBB_PREPAYMENT,
-        CBB_BOOKING_CANCEL,
+    ILB_PAYMENT: (
+        ILB_PAYMENT_MADE,
+        ILB_PAYMENT_BY_CARD,
+        ILB_PREPAYMENT,
+        ILB_BOOKING_CANCEL,
     ),
-    CBB_OTHER: (
-        CBB_NEAREST_PARKING,
-        CBB_IN_YARD_PARKING,
-        CBB_TOWEL,
-        CBB_WHAT_PROVIDE,
-        CBB_SHOPS,
-        CBB_EAT,
+    ILB_OTHER: (
+        ILB_NEAREST_PARKING,
+        ILB_IN_YARD_PARKING,
+        ILB_TOWEL,
+        ILB_WHAT_PROVIDE,
+        ILB_SHOPS,
+        ILB_EAT,
     ),
-    CBB_HOSTELS: (
-        CBB_NEVSKY,
-        CBB_PESTELYA,
+    ILB_HOSTELS: (
+        ILB_NEVSKY,
+        ILB_PESTELYA,
     )
 }
 
 
-class ILButton(InlineKeyboardButton):
-    """Класс кнопки, инициируемой текстом."""
-    def __init__(self, cbb: str, **_kwargs: Any):
-        super().__init__(text=CBB_CAPTIONS[cbb], callback_data=cbb, **_kwargs)
-
-
-def _get_il_kbd_v(items: Iterable[str]) -> List[List[ILButton]]:
-    btns = [[ILButton(item)] for item in items]
-    return btns
-
-
-def _get_il_kbd_h(items: Iterable[str]) -> List[List[ILButton]]:
-    return [[ILButton(item) for item in items]]
-
-
-def _get_il_kbd_vh(items_v: Iterable[str], items_h: Iterable[str]):
-    kbd = _get_il_kbd_v(items_v)
-    kbd.extend(_get_il_kbd_h(items_h))
-    return kbd
+def _get_kbd(
+    format: str = 'h',
+    *args: Iterable[str],
+    markup: ReplyMarkup = InlineKeyboardMarkup  # type: ignore
+):
+    """ Возвращает инлайн клавиатуру, формируемую по формату.
+    В format получает строку букв формата,
+    где 'h' - горизонтальное расположение клашиш, иначе - вертикальное.
+    В args получает наборы имён кнопок для формирования клавиш.
+    Порядок кнопок соответствует порядку букв в format.
+    """
+    btns = []
+    for i, ch in enumerate(format):
+        items = args[i]
+        if items:
+            btns.extend([
+                (
+                    lambda ch, btn: btn if ch == 'h' else [btn]
+                )(
+                    ch, ILButton1(item)
+                ) for item in items
+            ])
+    return markup(btns)  # type: ignore
 
 
 def _get_item(query, items: Iterable) -> str:
@@ -202,7 +224,7 @@ def _get_item(query, items: Iterable) -> str:
         if data in items:
             return data
         for item in items:
-            if CBB_CAPTIONS[item] in msg_text:
+            if ILB_CAPTIONS[item] in msg_text:
                 return item
     return ''
 
@@ -218,8 +240,9 @@ def _format_by_markdown(text: str) -> str:
 def _get_caption(base_str: str, key: str) -> str:
     """Возвращает форматированную строку."""
     return base_str.format(
-        _format_by_markdown(CBB_CAPTIONS[key])
+        _format_by_markdown(ILB_CAPTIONS[key])
     ) if key else ''
+
 
 def _get_message(hostel: str, data: str) -> str:
     """Формирует и возвращает строковое сообщение,
@@ -228,28 +251,39 @@ def _get_message(hostel: str, data: str) -> str:
     for key, value in MESSAGES.items():
         if key == data:
             text = ('\n').join((
-                value.get(CBB_ALL, ''),
+                value.get(ILB_ALL, ''),
                 value.get(hostel, '')
             )).strip()
             return _format_by_markdown(text)
     return ''
 
 
+def _get_category_kbd(category: str = ''):
+    categories = CATEGORIES.keys()
+    if category:
+        categories.remove(category)  # type: ignore
+    return _get_kbd(
+        'vvh',
+        [ILButton(category)] if category else None,  # type: ignore
+        CATEGORIES.get(category, None),
+        categories,
+    )
+
+
 def get_markup(hostel: str = '', category: str = '') -> InlineKeyboardMarkup:
     if not hostel:
-        kbd = _get_il_kbd_v(HOSTELS)
+        return _get_kbd('v', HOSTELS)
     elif not category:
-        kbd = _get_il_kbd_h(CATEGORIES.keys())
+        return _get_category_kbd()
     else:
-        kbd = _get_il_kbd_vh(CATEGORIES[category], CATEGORIES.keys())
-    return InlineKeyboardMarkup(kbd)
+        return _get_category_kbd(category)
 
 
-def get_message(query = None) -> Tuple[str, InlineKeyboardMarkup]:
+def get_message(query) -> str:
     """Формирует сообщение для вывода."""
     hostel = _get_item(query, HOSTELS)
     category = _get_item(query, CATEGORIES.keys())
-    if category == CBB_HOSTELS:
+    if category == ILB_HOSTELS:
         hostel = category = item = ''
     if query and query.data in CATEGORIES.keys():
         item = ''
@@ -265,4 +299,4 @@ def get_message(query = None) -> Tuple[str, InlineKeyboardMarkup]:
     )).strip()
     if not text:
         text = 'Привет ✌️\\.\nВыберите отель:'
-    return (text, get_markup(hostel, category))
+    return text

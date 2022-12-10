@@ -1,4 +1,11 @@
 from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    ReplyMarkup,
+)
+from telegram import (
     Update,
     ParseMode,
 )
@@ -12,22 +19,26 @@ from telegram.ext import (
 )
 
 import keyboards
+import telegram_markup
 import settings
+import buttons
 
-from two_steps_bot.decorators import log_errors
+from decorators import log_errors
+
 
 @log_errors
 def start_message(update: Update, context: CallbackContext):
     message = update.message
     chat_id = message.chat_id
     message_id = message.message_id
-    try:
+    try:пше
         while True:
             context.bot.delete_message(chat_id, message_id)
             message_id -= 1
-    except:
+    except Exception as err:
         pass
-    text, markup = keyboards.get_message()
+    text = keyboards.get_message(update.query)
+    markup = telegram_markup.ILMarkup()(buttons.ILB_START.callback)
     update.message.reply_text(
         text=text,
         parse_mode=ParseMode.MARKDOWN_V2,
@@ -38,16 +49,19 @@ def start_message(update: Update, context: CallbackContext):
 @log_errors
 def keyboard_callback_handler(update: Update, context: CallbackContext):
     query = update.callback_query
-    text, markup = keyboards.get_message(query)
+    reply_text = keyboards.get_message(query)
+    markup, text = buttons.get_markup(query)
+    # markup = telegram_markup.ILMarkup()(query.data)
 
+    print(query.message.message_id)
     query.edit_message_text(
-        text=text,
+        text=reply_text,
         parse_mode='MarkdownV2',
         reply_markup=markup,
     )
 
 
-def main():
+if __name__ == '__main__':
     updater = Updater(
         token=settings.TOKEN,
         request_kwargs={
@@ -69,7 +83,3 @@ def main():
     print('Bot starts...')
     updater.start_polling()
     updater.idle()
-
-
-if __name__ == '__main__':
-    main()

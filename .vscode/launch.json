@@ -19,7 +19,7 @@
             "name": "2-steps",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/two_steps_bot.py",
+            "program": "${workspaceFolder}/two_steps_bot/two_steps_bot.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },

@@ -21,19 +21,6 @@ import keyboards
 class Tour():
     """Продвигает пользователя по сети позиций."""
 
-    def _keyboard_callback_handler(self,
-        update: Update,
-        context: CallbackContext
-    ) -> None:
-        query = update.callback_query
-        text, markup = keyboards.get_message(query)
-
-        query.edit_message_text(
-            text=text,
-            parse_mode='MarkdownV2',
-            reply_markup=markup,
-        )
-
     def _start_message(self, update: Update,
         context: CallbackContext
     ) -> None:
@@ -50,6 +37,21 @@ class Tour():
         update.message.reply_text(
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
+            reply_markup=markup,
+        )
+
+    def _keyboard_callback_handler(self,
+        update: Update,
+        context: CallbackContext
+    ) -> None:
+        query = update.callback_query
+        text, markup = keyboards.get_message(query)
+
+
+
+        query.edit_message_text(
+            text=text,
+            parse_mode='MarkdownV2',
             reply_markup=markup,
         )
 
