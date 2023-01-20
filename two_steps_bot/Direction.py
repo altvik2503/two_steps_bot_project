@@ -1,21 +1,10 @@
 from typing import Optional
+from dataclasses import dataclass
 
 from Position import Position
 
+@dataclass
 class Direction():
-    """Направление."""
-
-    def __init__(self, image: Optional[str] = None, next: Optional[Position] = None) -> None:
-        self._image = image
-        self._next = next
-
-    @property
-    def image(self):
-        """Возвращает ссылку на изображение направления."""
-        return self._image
-
-    @property
-    def next(self):
-        """Возвращает ссылку на следующую позицию."""
-        return self._next
-
+    """Определяет параметры направления перемещения из позиции."""
+    image: Optional[str] = None
+    next: Optional[Position] = None

@@ -279,7 +279,7 @@ def get_markup(hostel: str = '', category: str = '') -> InlineKeyboardMarkup:
         return _get_category_kbd(category)
 
 
-def get_message(query) -> str:
+def get_message(query = None) -> str:
     """Формирует сообщение для вывода."""
     hostel = _get_item(query, HOSTELS)
     category = _get_item(query, CATEGORIES.keys())

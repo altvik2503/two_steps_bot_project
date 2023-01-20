@@ -1,34 +1,35 @@
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Iterable
+from dataclasses import dataclass, field
 
 from Direction import Direction
 
 
+@dataclass
 class Position():
     """Точка остановки."""
 
-    def __init__(self, directions: List[Direction] = []) -> None:
-        self._directions = directions
-        self._active = 0
+    directions: List[Direction] = field(default_factory=list)
+    selected: int = 0
 
     @property
     def _size(self) -> int:
         """Возвращает количество напрпавлений."""
-        return len(self._directions)
+        return len(self.directions)
 
     @property
     def image(self):
         """Возвращает изображение активного направления."""
-        return self._directions[self._active].image
+        return self.directions[self.selected].image
 
     @property
     def next(self):
         """Возвращает ссылку на следующую позицию активного направления."""
-        return self._directions[self._active].next
+        return self.directions[self.selected].next
 
     def _rotate(self, step: int) -> None:
         """Поворачивает текущее направление до активного (с изображением)."""
         for _ in range(self._size):
-            self._active = (self._active + step) % self._size
+            self.selected = (self.selected + step) % self._size
             if self.image:
                 break
 
@@ -40,9 +41,12 @@ class Position():
         """Поворачивает текущее направление направо."""
         self._rotate(1)
 
-    def add(self, directions: Union['Direction', List['Direction']]) -> None:
-        if isinstance(directions, (List, Tuple)):
-            self._directions.extend(directions)
+    def add(self,
+        directions: Union['Direction',
+        Iterable['Direction']]
+    ) -> None:
+        """Добавляет направление в конец списка направлений позиции."""
+        if isinstance(directions, Iterable):
+            self.directions.extend(directions)
         else:
-            self._directions.append(directions)
-
+            self.directions.append(directions)

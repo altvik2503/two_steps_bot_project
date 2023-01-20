@@ -1,9 +1,15 @@
-from typing import Tuple, Optional, Iterable
+from typing import Optional
 from telegram import (
-    InlineKeyboardMarkup,
     CallbackQuery,
+    Update,
+    ParseMode,
 )
+from telegram.ext import (
+    CallbackContext,
+)
+
 from telegram_markup import ILButton, ILMarkup
+from decorators import log_errors
 
 ILB_CHECK_IN_TIME = ILButton(
     'check_in_time',
@@ -173,7 +179,6 @@ ILB_PESTELYA = ILButton(
         ILB_EAT.callback,
         'Столовая "Тарелка", ул. Пестеля, 8.',
     ),
-
 )
 ILB_NEVSKY = ILButton(
     'nevsky',
@@ -253,15 +258,13 @@ ILB_ALL = ILButton(
         'Нет 😙. Только средство д/мытья посуды и жидкое мыло.',
     ),
 )
-ILB_SELECTED_HOSTEL = None
-HOSTELS = (ILB_NEVSKY, ILB_PESTELYA)
 
-# ILB_HOSTELS = ILButton(
-#     'hostels',
-#     'Отель...',
-#     ILMarkup.markup_line,
-#     *(ILB_NEVSKY, ILB_PESTELYA,)
-# )
+ILB_HOSTELS = ILButton(
+    'hostels',
+    'Отель...',
+    ILMarkup.markup_line,
+    *(ILB_NEVSKY, ILB_PESTELYA,)
+)
 
 ILB_CATEGORIES = ILButton(
     'categories',
@@ -277,7 +280,7 @@ ILB_START = ILButton(
     use_footer=False,
 )
 
-ILMarkup.footer = {
+info_footer = {
     'default': ILMarkup.markup_line(
         ILB_CATEGORIES,
     ),
@@ -338,38 +341,118 @@ ILMarkup.footer = {
 }
 
 
-def get_selected_hostel(query: CallbackQuery) -> Optional[ILButton]:
-    return ILButton.find_button_in_text(query.message.text, HOSTELS)  # type: ignore
+class State():
 
+    def __init__(self):
+        self._hostel: Optional[ILButton] = None
+        self._category: Optional[ILButton] = None
+        self._item: Optional[ILButton] = None
 
-def get_markup(query: CallbackQuery) -> Tuple[InlineKeyboardMarkup, str]:
-    callback = query.data
-    il_btn = ILButton.button_by_callback(callback)
-    text = ''
-    if il_btn:
-        hostel = get_selected_hostel(query)
-        if hostel:
-            text = il_btn.get_text((ILB_ALL, hostel))  # type: ignore
-    return ILMarkup()(callback), text
+    @classmethod
+    def _delete_messages(cls, message, context: CallbackContext) -> None:
+        message_id = message.message_id
+        try:
+            while True:
+                context.bot.delete_message(message.chat_id, message_id)
+                message_id -= 1
+        except:
+            pass
 
-# def get_message(query) -> str:
-#     """Формирует сообщение для вывода."""
-#     hostel = _get_item(query, HOSTELS)  # type: ignore
-#     category = _get_item(query, CATEGORIES.keys())
-#     if category == ILB_HOSTELS:
-#         hostel = category = item = ''
-#     if query and query.data in CATEGORIES.keys():
-#         item = ''
-#     else:
-#         item = _get_item(query, MESSAGES.keys())
+    @property
+    def hostel(self) -> Optional[ILButton]:
+        return self._hostel
+    @hostel.setter
+    def hostel(self, selection: Optional[ILButton]):
+        self._hostel = selection
 
-#     text = _get_message(hostel, item)
-#     text = ('\n').join((
-#         _get_caption('*Выбран отель "{}"*', hostel),
-#         _get_caption('*{}*', category),
-#         _get_caption('__*{}*__', item),
-#         text,
-#     )).strip()
-#     if not text:
-#         text = 'Привет ✌️\\.\nВыберите отель:'
-#     return text
+    @property
+    def category(self) -> Optional[ILButton]:
+        return self._category
+    @category.setter
+    def category(self, selection: Optional[ILButton]):
+        self._category = selection
+
+    @property
+    def item(self) -> Optional[ILButton]:
+        return self._item
+    @item.setter
+    def item(self, selection: Optional[ILButton]):
+        self._item = selection
+
+    def clear(self) -> None:
+        self.hostel = self.category = self.item = None
+
+    def get_message(self) -> str:
+        """Формирует сообщение для вывода."""
+        def _format_by_markdown(text: str) -> str:
+            """Фоматирует текст в соответствии с форматом MARKDOWN."""
+            CHARS = '_*[]()~`>#+-=|{}.!'
+            for ch in CHARS:
+                text = text.replace(ch, f'\\{ch}')
+            return text
+
+        def _get_caption(format_str: str, il_button: Optional[ILButton]) -> str:
+            """Возвращает форматированную строку."""
+            return format_str.format(
+                _format_by_markdown(il_button.caption())
+            ) if il_button else ''
+
+        def _get_message_text() -> str:
+            """Формирует и возвращает строковое сообщение,
+            соответсвующее текущему состоянию.
+            """
+            return _format_by_markdown('\n'.join((
+                ILB_ALL.caption(self.item),
+                self.hostel.caption(self.item) if self.hostel else '',
+            ))).strip() if self.item else ''
+
+        text = ('\n').join((
+            _get_caption('*Выбран отель "{}"*', self.hostel),
+            _get_caption('*{}*', self.category),
+            _get_caption('__*{}*__', self.item),
+            _get_message_text(),
+        )).strip()
+        return '\n'.join((
+                'Привет ✌️',
+                'Выберите отель:',
+            )) if not text else text
+
+    def _set_items(self, query:CallbackQuery) -> None:
+        callback = query.data if query else ''
+        callback_button = ILButton.button_by_callback(callback)
+        if callback_button in ILB_HOSTELS.children.buttons:
+            self.hostel = callback_button
+            self.category = self.item = None
+        elif callback_button in ILB_CATEGORIES.children.buttons:
+            self.category = callback_button
+            self.item = None
+        else:
+            self.item = callback_button
+
+    @log_errors
+    def start_handler(self, update: Update, context: CallbackContext):
+        message = update.message
+        self._delete_messages(message, context)
+        self.clear()
+
+        text = self.get_message()
+        markup = ILMarkup()('start')
+        message.reply_text(
+            text=text,
+            parse_mode=ParseMode.MARKDOWN_V2,
+            reply_markup=markup,
+        )
+
+    @log_errors
+    def keyboard_callback_handler(self, update: Update, context: CallbackContext):
+        query = update.callback_query
+
+        self._set_items(query)
+        m = ILMarkup()(callback=query.data, footer=info_footer)
+        query.edit_message_text(
+            text=self.get_message(),
+            parse_mode='MarkdownV2',
+            reply_markup=m
+
+            # reply_markup=ILMarkup()(callback=query.data, footer=info_footer),
+        )
